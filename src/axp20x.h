@@ -611,7 +611,7 @@ public:
 
     int setTimeOutShutdown(bool en);
 
-    int shutdown(bool wake);
+    int shutdown(bool wake = false);
 
     /**
      * params: axp_irq_t

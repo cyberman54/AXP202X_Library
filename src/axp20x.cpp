@@ -894,7 +894,7 @@ int AXP20X_Class::setTimeOutShutdown(bool en)
     return AXP_PASS;
 }
 
-int AXP20X_Class::shutdown(bool wake = false)
+int AXP20X_Class::shutdown(bool wake)
 {
     uint8_t val;
     if (!_init)
