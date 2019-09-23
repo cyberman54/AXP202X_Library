@@ -32,28 +32,28 @@ github:https://github.com/lewisxhe/AXP202X_Libraries
 #include <math.h>
 
 const uint8_t AXP20X_Class::startupParams[] = {
-    0b00000000,
-    0b01000000,
-    0b10000000,
-    0b11000000};
+    0b00000000,  // 128ms
+    0b01000000,  // 3sec
+    0b10000000,  // 1sec
+    0b11000000}; // 2sec
 
 const uint8_t AXP20X_Class::longPressParams[] = {
-    0b00000000,
-    0b00010000,
-    0b00100000,
-    0b00110000};
+    0b00000000,  // 1sec
+    0b00010000,  // 1.5sec
+    0b00100000,  // 2sec
+    0b00110000}; // 2.5sec
 
 const uint8_t AXP20X_Class::shutdownParams[] = {
-    0b00000000,
-    0b00000001,
-    0b00000010,
-    0b00000011};
+    0b00000000,  // 4sec
+    0b00000001,  // 6sec
+    0b00000010,  // 8sec
+    0b00000011}; //10sec
 
 const uint8_t AXP20X_Class::targetVolParams[] = {
-    0b00000000,
-    0b00100000,
-    0b01000000,
-    0b01100000};
+    0b00000000,  // 4.10V
+    0b00100000,  // 4.15V
+    0b01000000,  // 4.20V
+    0b01100000}; // 4.36V
 
 // Power Output Control register
 uint8_t AXP20X_Class::_outputReg;
@@ -894,11 +894,25 @@ int AXP20X_Class::setTimeOutShutdown(bool en)
     return AXP_PASS;
 }
 
-int AXP20X_Class::shutdown()
+int AXP20X_Class::shutdown(bool wake = false)
 {
     uint8_t val;
     if (!_init)
         return AXP_NOT_INIT;
+
+    if (wake)
+    {
+        // enable PEK wakeup function in sleep mode
+        _readByte(AXP202_VOFF_SET, 1, &val);
+        val |= (1 << 3);
+        _writeByte(AXP202_VOFF_SET, 1, &val);
+
+        // use short press PEK as wakeup IRQ
+        _readByte(AXP202_INTEN3, 1, &val);
+        val |= (1 << 1);
+        _writeByte(AXP202_INTEN3, 1, &val);
+    }
+
     _readByte(AXP202_OFF_CTL, 1, &val);
     val |= (1 << 7);
     _writeByte(AXP202_OFF_CTL, 1, &val);
